@@ -1,4 +1,4 @@
-# Installs the latest EM Calculator for the current user.
+# Installs the latest ElectroFISH (EM Calculator up to version 2.7) for the current user.
 #
 #   irm https://raw.githubusercontent.com/zod1ach/em-calculator-downloads/main/install.ps1 | iex
 #
@@ -17,9 +17,9 @@ $ProgressPreference = "SilentlyContinue"
 $repo = "zod1ach/em-calculator-downloads"
 $headers = @{ "User-Agent" = "em-calculator-install"; "Accept" = "application/vnd.github+json" }
 
-Write-Host "Looking up the latest EM Calculator release..."
+Write-Host "Looking up the latest ElectroFISH release..."
 $release = Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/releases/latest" -Headers $headers
-$installer = $release.assets | Where-Object { $_.name -match '^EM-Calculator-Setup-[0-9.]+\.exe$' } | Select-Object -First 1
+$installer = $release.assets | Where-Object { $_.name -match '^(ElectroFISH|EM-Calculator)-Setup-[0-9.]+\.exe$' } | Select-Object -First 1
 if (-not $installer) { throw "The latest release ($($release.tag_name)) has no installer." }
 $checksum = $release.assets | Where-Object { $_.name -eq "$($installer.name).sha256" } | Select-Object -First 1
 if (-not $checksum) { throw "The latest release ($($release.tag_name)) has no SHA-256 file, so the download cannot be checked." }
@@ -46,16 +46,16 @@ if ($actual -ne $expected) {
 Write-Host "The download matches the published SHA-256."
 
 if ($env:EM_DOWNLOAD_ONLY -eq "1") {
-  Write-Host "Saved $target. Run it to install EM Calculator $($release.tag_name)."
+  Write-Host "Saved $target. Run it to install ElectroFISH $($release.tag_name)."
   return
 }
 
 if ($env:EM_INSTALL_SILENT -eq "1") {
-  Write-Host "Installing EM Calculator $($release.tag_name)..."
+  Write-Host "Installing ElectroFISH $($release.tag_name)..."
   $process = Start-Process -FilePath $target -ArgumentList "/S" -Wait -PassThru
   if ($process.ExitCode -ne 0) { throw "The installer ended with code $($process.ExitCode)." }
-  Write-Host "EM Calculator $($release.tag_name) is installed. Open it from the Start menu."
+  Write-Host "ElectroFISH $($release.tag_name) is installed. Open it from the Start menu."
 } else {
-  Write-Host "Starting the installer for EM Calculator $($release.tag_name)..."
+  Write-Host "Starting the installer for ElectroFISH $($release.tag_name)..."
   Start-Process -FilePath $target
 }
